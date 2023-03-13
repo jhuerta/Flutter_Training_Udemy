@@ -1,0 +1,2 @@
+- Everything is a widget
+- UI as code: no drag drop, every UI element is written in code
