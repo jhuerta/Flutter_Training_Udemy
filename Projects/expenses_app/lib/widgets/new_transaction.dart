@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
 
-class NewTransaction extends StatelessWidget {
-  late String newAmountExpense = "";
-  final titleController = TextEditingController();
-
+class NewTransaction extends StatefulWidget {
   Function(String title, double amount) addNewTransaction;
 
   NewTransaction(this.addNewTransaction, {super.key});
 
-  void addNexExpense() {
-    var amountAsDouble = double.parse(newAmountExpense);
-    addNewTransaction(titleController.text, amountAsDouble);
+  @override
+  State<NewTransaction> createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
+  final titleController = TextEditingController();
+
+  final amountController = TextEditingController();
+
+  void addNewExpense() {
+    var text = titleController.text;
+    var amount = double.parse(amountController.text);
+    if (text.isEmpty || amount <= 0) {
+      return;
+    }
+    widget.addNewTransaction(text, amount);
+
+    Navigator.of(context).pop();
   }
 
   @override
@@ -22,17 +34,19 @@ class NewTransaction extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             TextField(
+              keyboardType: TextInputType.text,
               decoration: InputDecoration(labelText: "Title"),
               controller: titleController,
+              onSubmitted: (_) => addNewExpense(),
             ),
             TextField(
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(labelText: "Amount"),
-              onChanged: (val) {
-                newAmountExpense = val;
-              },
+              controller: amountController,
+              onSubmitted: (_) => addNewExpense(),
             ),
             ElevatedButton(
-              onPressed: addNexExpense,
+              onPressed: addNewExpense,
               child: const Text("Add"),
             ),
           ],
