@@ -7,6 +7,25 @@ class TransactionList extends StatelessWidget {
 
   TransactionList(List<Transaction> this.transactions, {super.key}) {}
 
+  Card buildTransactionTile(Transaction transaction, BuildContext context) {
+    return Card(
+      elevation: 5,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+      child: ListTile(
+        title: Text(transaction.title),
+        subtitle: Text(DateFormat.yMd().format(transaction.date)),
+        leading: CircleAvatar(
+          radius: 25,
+          child: Padding(
+            padding: EdgeInsets.all(5),
+            child:
+                FittedBox(child: Text(transaction.amount.toStringAsFixed(2))),
+          ),
+        ),
+      ),
+    );
+  }
+
   Card buildTransactionCard(Transaction transaction, BuildContext context) {
     return Card(
       shadowColor: Colors.blueGrey,
@@ -68,7 +87,8 @@ class TransactionList extends StatelessWidget {
       child: ListView.builder(
           itemCount: transactions.length,
           itemBuilder: (context, index) {
-            return buildTransactionCard(transactions[index], context);
+            return buildTransactionTile(transactions[index], context);
+            // return buildTransactionCard(transactions[index], context);
           }),
 
       // crossAxisAlignment: CrossAxisAlignment.stretch,
