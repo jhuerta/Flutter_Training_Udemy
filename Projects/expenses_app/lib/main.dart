@@ -11,8 +11,36 @@ class ExpensesApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My Expenses List',
       home: HomePage(),
+      title: 'My Expenses List',
+      theme: ThemeData(
+        primarySwatch: Colors.orange,
+        secondaryHeaderColor: Colors.purple,
+        fontFamily: 'Quicksand',
+        textTheme: ThemeData.light().textTheme.copyWith(
+              titleMedium: const TextStyle(
+                fontFamily: 'Quicksand',
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                fontStyle: FontStyle.italic,
+              ),
+              // bodyMedium - Font of topBar
+              bodyMedium: const TextStyle(
+                fontFamily: 'Quicksand',
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+        appBarTheme: const AppBarTheme(
+          titleTextStyle: TextStyle(
+            fontFamily: 'OpenSans',
+            fontSize: 25,
+            fontWeight: FontWeight.w600,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -60,6 +88,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     return [t1, t2, t3, t4, t5];
+    // return [];
   }
 
   late List<Transaction> userTransactionList = getTransactions();
@@ -99,17 +128,20 @@ class _HomePageState extends State<HomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () => {_startAddNewTransaction(context)},
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
-      title: const Text('My Expenses App'),
+      title: const Text(
+        'My Expenses App',
+        //style: TextStyle(fontFamily: 'Quicksand'),
+      ),
       actions: <Widget>[
         IconButton(
-          icon: Icon(Icons.add),
+          icon: const Icon(Icons.add),
           onPressed: () => {_startAddNewTransaction(context)},
         ),
       ],
@@ -127,7 +159,7 @@ class BodyWidget extends StatelessWidget {
     var titleSection = Card(
       elevation: 5,
       child: Container(
-        color: Colors.blue,
+        color: Theme.of(context).primaryColorDark,
         width: double.infinity,
         child: const Text('List of past expenses'),
       ),
