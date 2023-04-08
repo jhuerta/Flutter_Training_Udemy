@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NewTransaction extends StatefulWidget {
-  Function(String title, double amount) addNewTransaction;
+  Function(String title, double amount, DateTime date) addNewTransaction;
 
   NewTransaction(this.addNewTransaction, {super.key});
 
@@ -11,18 +12,34 @@ class NewTransaction extends StatefulWidget {
 
 class _NewTransactionState extends State<NewTransaction> {
   final titleController = TextEditingController();
-
   final amountController = TextEditingController();
+  DateTime? _selectedDate;
 
   void addNewExpense() {
     var text = titleController.text;
     var amount = double.parse(amountController.text);
-    if (text.isEmpty || amount <= 0) {
+    if (text.isEmpty || amount <= 0 || _selectedDate == null) {
       return;
     }
-    widget.addNewTransaction(text, amount);
+    widget.addNewTransaction(text, amount, _selectedDate!);
 
     Navigator.of(context).pop();
+  }
+
+  void _presentDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(Duration(days: 2)),
+      lastDate: DateTime.now().add(Duration(days: 2)),
+    ).then((pickedDate) {
+      if (pickedDate == null) {
+        return;
+      }
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    });
   }
 
   @override
@@ -44,6 +61,36 @@ class _NewTransactionState extends State<NewTransaction> {
               decoration: InputDecoration(labelText: "Amount"),
               controller: amountController,
               onSubmitted: (_) => addNewExpense(),
+            ),
+            Container(
+              height: 70,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _selectedDate == null
+                          ? "No date chosen"
+                          : DateFormat.yMd().format(_selectedDate!),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.all(10),
+                        backgroundColor: Colors.purple,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: _presentDatePicker,
+                      child: const Text(
+                        "Pick Date",
+                        style: TextStyle(
+                            fontWeight: FontWeight.normal, fontSize: 10),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
             ElevatedButton(
               onPressed: addNewExpense,

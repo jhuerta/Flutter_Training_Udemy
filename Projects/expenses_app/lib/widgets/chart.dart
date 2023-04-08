@@ -72,12 +72,13 @@ class ChartWidget extends StatelessWidget {
       var percentageExpense = double.parse(e['percentage']);
 
       return Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(e['day']),
           Container(
-            height: 60,
+            height: 100,
             width: 10,
-            child: Stack(children: [
+            child: Stack(alignment: AlignmentDirectional.bottomEnd, children: [
               FractionallySizedBox(
                 heightFactor: normalizedExpense / 100,
                 child: Container(
@@ -104,6 +105,15 @@ class ChartWidget extends StatelessWidget {
               //   ),
               // ),
             ]),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 2, right: 2, top: 2, bottom: 2),
+            width: 40,
+            child: FittedBox(
+                child: Text(
+              style: TextStyle(color: Colors.green),
+              '\$${double.parse(e['amount']).toStringAsFixed(2)}',
+            )),
           ),
         ],
       );

@@ -12,6 +12,7 @@ class ExpensesApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // var colorScheme2 = Theme.of(context).colorScheme;
     return MaterialApp(
       home: HomePage(),
       title: 'My Expenses List',
@@ -107,7 +108,7 @@ class _HomePageState extends State<HomePage> {
         amount: 50 + randomAmount.nextDouble() * 100,
         date: DateTime.now().add(Duration(days: daysToSubstract)),
         id: index.toString(),
-        title: getRandomString(75),
+        title: '${index.toString()} - ${getRandomString(10)}',
       );
     });
 
@@ -130,16 +131,24 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  void _addNewTransaction(String title, double amount) {
+  void _addNewTransaction(String title, double amount, DateTime date) {
     var newTransaction = Transaction(
       amount: amount,
       title: title,
-      date: DateTime.now(),
+      date: date,
       id: DateTime.now().toString(),
     );
 
     setState(() {
       userTransactionList.add(newTransaction);
+    });
+  }
+
+  void deleteTransaction(String id) {
+    setState(() {
+      userTransactionList.removeWhere((element) => element.id == id);
+      // userTransactionList =
+      //     userTransactionList.where((element) => element.id != id).toList();
     });
   }
 
@@ -149,7 +158,7 @@ class _HomePageState extends State<HomePage> {
       appBar: buildAppBar(context),
       body: userTransactionList.isEmpty
           ? noTransactionWidget()
-          : BodyWidget(userTransactionList),
+          : BodyWidget(deleteTransaction, userTransactionList),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () => {_startAddNewTransaction(context)},
@@ -197,8 +206,9 @@ class _HomePageState extends State<HomePage> {
 
 class BodyWidget extends StatelessWidget {
   List<Transaction> userTransactionList;
+  Function(String id) deleteTransaction;
 
-  BodyWidget(this.userTransactionList, {super.key});
+  BodyWidget(this.deleteTransaction, this.userTransactionList, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +226,7 @@ class BodyWidget extends StatelessWidget {
       children: <Widget>[
         titleSection,
         ChartWidget(transactionsForChart),
-        TransactionList(transactionsForList),
+        TransactionList(deleteTransaction, transactionsForList),
       ],
     );
 
@@ -230,7 +240,7 @@ class BodyWidget extends StatelessWidget {
   List<Transaction> get transactionsForList {
     return userTransactionList
         .where((element) => element.date
-            .isBefore(DateTime.now().subtract(const Duration(days: 1))))
+            .isAfter(DateTime.now().subtract(const Duration(days: 10))))
         .toList();
   }
 

@@ -4,8 +4,11 @@ import '../models/transaction.dart';
 
 class TransactionList extends StatelessWidget {
   List<Transaction> transactions;
+  Function(String id) deleteTransaction;
 
-  TransactionList(List<Transaction> this.transactions, {super.key}) {}
+  // Function(String id) deleteTransaction;
+
+  TransactionList(this.deleteTransaction, this.transactions, {super.key}) {}
 
   Card buildTransactionTile(Transaction transaction, BuildContext context) {
     return Card(
@@ -21,6 +24,13 @@ class TransactionList extends StatelessWidget {
             child:
                 FittedBox(child: Text(transaction.amount.toStringAsFixed(2))),
           ),
+        ),
+        trailing: IconButton(
+          onPressed: () {
+            deleteTransaction(transaction.id);
+          },
+          icon: Icon(Icons.delete),
+          color: Theme.of(context).colorScheme.error,
         ),
       ),
     );
@@ -83,7 +93,7 @@ class TransactionList extends StatelessWidget {
   Widget build(BuildContext context) {
     transactions.sort((b, a) => (a.date.compareTo(b.date)));
     var transactionsSection = Container(
-      height: 450,
+      height: 300,
       child: ListView.builder(
           itemCount: transactions.length,
           itemBuilder: (context, index) {
