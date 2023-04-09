@@ -44,59 +44,66 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    var actionSection = Card(
-      child: Container(
-        margin: EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            TextField(
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(labelText: "Title"),
-              controller: titleController,
-              onSubmitted: (_) => addNewExpense(),
-            ),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: "Amount"),
-              controller: amountController,
-              onSubmitted: (_) => addNewExpense(),
-            ),
-            Container(
-              height: 70,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _selectedDate == null
-                          ? "No date chosen"
-                          : DateFormat.yMd().format(_selectedDate!),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(10),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.all(10),
-                        backgroundColor: Colors.purple,
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: _presentDatePicker,
-                      child: const Text(
-                        "Pick Date",
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal, fontSize: 10),
-                      ),
-                    ),
-                  )
-                ],
+    var actionSection = SingleChildScrollView(
+      child: Card(
+        child: Container(
+          padding: EdgeInsets.only(
+            left: 10,
+            right: 10,
+            top: 0,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 10,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              TextField(
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(labelText: "Title"),
+                controller: titleController,
+                onSubmitted: (_) => addNewExpense(),
               ),
-            ),
-            ElevatedButton(
-              onPressed: addNewExpense,
-              child: const Text("Add"),
-            ),
-          ],
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: "Amount"),
+                controller: amountController,
+                onSubmitted: (_) => addNewExpense(),
+              ),
+              Container(
+                height: 70,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _selectedDate == null
+                            ? "No date chosen"
+                            : DateFormat.yMd().format(_selectedDate!),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.all(10),
+                          backgroundColor: Colors.purple,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: _presentDatePicker,
+                        child: const Text(
+                          "Pick Date",
+                          style: TextStyle(
+                              fontWeight: FontWeight.normal, fontSize: 10),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                onPressed: addNewExpense,
+                child: const Text("Add"),
+              ),
+            ],
+          ),
         ),
       ),
     );
