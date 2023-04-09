@@ -29,15 +29,39 @@ class TransactionList extends StatelessWidget {
                 FittedBox(child: Text(transaction.amount.toStringAsFixed(2))),
           ),
         ),
-        trailing: IconButton(
-          onPressed: () {
-            deleteTransaction(transaction.id);
-          },
-          icon: Icon(Icons.delete),
-          color: Theme.of(context).colorScheme.error,
-        ),
+        trailing: BuildIconButton(transaction, context),
       ),
     );
+  }
+
+  Widget BuildIconButton(Transaction transaction, BuildContext context) {
+    bool bigScreen = MediaQuery.of(context).size.width > 400;
+    ;
+    var smallButton = IconButton(
+      onPressed: () {
+        deleteTransaction(transaction.id);
+      },
+      icon: Icon(Icons.delete),
+      color: Theme.of(context).colorScheme.error,
+    );
+
+    var bigButton = ElevatedButton.icon(
+      icon: Icon(Icons.delete),
+      style: const ButtonStyle(
+        iconColor:
+            MaterialStatePropertyAll<Color>(Color.fromARGB(255, 238, 5, 207)),
+        backgroundColor: MaterialStatePropertyAll<Color>(Colors.white),
+        foregroundColor:
+            MaterialStatePropertyAll<Color>(Color.fromARGB(255, 255, 17, 0)),
+        elevation: MaterialStatePropertyAll(0),
+      ),
+      label: Text("Delete Transaction"),
+      onPressed: () {
+        deleteTransaction(transaction.id);
+      },
+    );
+
+    return bigScreen ? bigButton : smallButton;
   }
 
   Card buildTransactionCard(Transaction transaction, BuildContext context) {

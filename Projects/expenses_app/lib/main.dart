@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'models/transaction.dart';
 import 'widgets/chart.dart';
 import 'widgets/transaction_list.dart';
 import 'widgets/new_transaction.dart';
+import 'dart:io';
 import 'dart:math';
 
 void main() {
@@ -31,7 +33,7 @@ class ExpensesApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         secondaryHeaderColor: Colors.purple,
         fontFamily: 'Quicksand',
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
           foregroundColor: Colors.white,
           backgroundColor: Colors.green,
         ),
@@ -114,9 +116,15 @@ class _HomePageState extends State<HomePage> {
     final randomAmount = new Random();
 
     var transactionList = List.generate(50, (index) {
-      var daysToSubstract = (-1) * (randomAmount.nextInt(100));
+      var daysToSubstract = index % 7;
+      // var daysToSubstract = (-1) * (randomAmount.nextInt(7));
+      double quantity = (((daysToSubstract == 1) ||
+              (daysToSubstract == 8) ||
+              (daysToSubstract == 8)))
+          ? 200
+          : 0;
       return Transaction(
-        amount: 50 + randomAmount.nextDouble() * 100,
+        amount: quantity,
         date: DateTime.now().add(Duration(days: daysToSubstract)),
         id: index.toString(),
         title: '${index.toString()} - ${getRandomString(10)}',
@@ -167,21 +175,41 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var appBarWidget = buildAppBar(context);
-    var heightAppBar = appBarWidget.preferredSize.height;
+    bool isIOS = Platform.isIOS;
+
+    isIOS = true;
+
+    var appBar = buildAppBar(isIOS, context);
+
+    var appBarWidget = appBar['AppBar'];
+    var heightAppBar = appBar['Dimentions'] as double;
     var topPadding = MediaQuery.of(context).padding.top;
-    return Scaffold(
-      appBar: appBarWidget,
+    var androidScaffold = Scaffold(
+      appBar: appBarWidget as PreferredSizeWidget,
       body: userTransactionList.isEmpty
           ? noTransactionWidget()
           : BodyWidget(deleteTransaction, userTransactionList,
               heightAppBar + topPadding),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => {_startAddNewTransaction(context)},
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: isIOS
+          ? Container()
+          : FloatingActionButton(
+              onPressed: () => {_startAddNewTransaction(context)},
+              child: const Icon(Icons.add),
+            ),
     );
+
+    var cuppertinoScaffold = isIOS
+        ? CupertinoPageScaffold(
+            navigationBar: appBar['AppBar'] as CupertinoNavigationBar,
+            child: userTransactionList.isEmpty
+                ? noTransactionWidget()
+                : BodyWidget(deleteTransaction, userTransactionList,
+                    heightAppBar + topPadding),
+          )
+        : CupertinoPageScaffold(child: Text("Not Implemented"));
+
+    return isIOS ? cuppertinoScaffold : androidScaffold;
   }
 
   Row noTransactionWidget() {
@@ -207,8 +235,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  AppBar buildAppBar(BuildContext context) {
-    return AppBar(
+  Map<String, Object> buildAppBar(bool isIOS, BuildContext context) {
+    var androidAppBar = AppBar(
       title: const Text(
         'My Expenses App',
         //style: TextStyle(fontFamily: 'Quicksand'),
@@ -220,6 +248,26 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     );
+    var iosAppBar = CupertinoNavigationBar(
+      middle: Text("My Expenses App"),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          GestureDetector(
+            child: Icon(CupertinoIcons.add),
+            onTap: () => {_startAddNewTransaction(context)},
+          )
+        ],
+      ),
+      backgroundColor: Colors.orange,
+    );
+    return {
+      'Dimentions': isIOS
+          ? (iosAppBar.preferredSize.height)
+          : androidAppBar.preferredSize.height,
+      'AppBar': isIOS ? iosAppBar : androidAppBar
+    };
   }
 }
 
@@ -243,8 +291,6 @@ class _BodyWidgetState extends State<BodyWidget> {
   Widget build(BuildContext context) {
     bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-    print("isLandscape------------------------");
-    print(isLandscape);
     var titleSection = Card(
       elevation: 5,
       child: Container(
@@ -257,51 +303,52 @@ class _BodyWidgetState extends State<BodyWidget> {
     var availableHeight =
         (MediaQuery.of(context).size.height - widget.totalTopBarsHeight);
 
-    var bodyWidget = SingleChildScrollView(
-      child: Column(
-        // mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          if (isLandscape)
-            Container(
-              height: availableHeight * 0.1,
-              child: Row(
-                children: [
-                  const Text(
-                    "Show",
-                  ),
-                  Switch(
-                      value: showChart,
-                      onChanged: (value) {
-                        setState(() {
-                          showChart = value;
-                        });
-                      }),
-                ],
+    var bodyWidget = SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            if (isLandscape)
+              Container(
+                height: availableHeight * 0.1,
+                child: Row(
+                  children: [
+                    Material(
+                      child: Text(
+                        "Show dd",
+                      ),
+                    ),
+                    Material(
+                      child: Switch.adaptive(
+                          value: showChart,
+                          onChanged: (value) {
+                            setState(() {
+                              showChart = value;
+                            });
+                          }),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          // titleSection,
-          if (!isLandscape)
-            Container(
-                height: availableHeight * 0.3,
-                child: ChartWidget(availableHeight, transactionsForChart)),
-          if (!isLandscape)
-            TransactionList(0.7, availableHeight, widget.deleteTransaction,
-                transactionsForList),
-          if (isLandscape && showChart)
-            Container(
-                height: availableHeight * 0.9,
-                child: ChartWidget(availableHeight, transactionsForChart)),
-          if (isLandscape && !showChart)
-            TransactionList(0.9, availableHeight, widget.deleteTransaction,
-                transactionsForList),
-        ],
+            // titleSection,
+            if (!isLandscape)
+              Container(
+                  height: availableHeight * 0.3,
+                  child: ChartWidget(availableHeight, transactionsForChart)),
+            if (!isLandscape)
+              TransactionList(0.7, availableHeight, widget.deleteTransaction,
+                  transactionsForList),
+            if (isLandscape && showChart)
+              Container(
+                  height: availableHeight * 0.9,
+                  child: ChartWidget(availableHeight, transactionsForChart)),
+            if (isLandscape && !showChart)
+              TransactionList(0.9, availableHeight, widget.deleteTransaction,
+                  transactionsForList),
+          ],
+        ),
       ),
     );
-
-    // var chartWidget = ChartWidget(userTransactionList);
-    // var values = chartWidget.groupedTransactionsValues;
-    // print(values);
 
     return bodyWidget;
   }
