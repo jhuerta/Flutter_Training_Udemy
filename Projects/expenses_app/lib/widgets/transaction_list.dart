@@ -6,11 +6,12 @@ class TransactionList extends StatelessWidget {
   List<Transaction> transactions;
   double availableHeight;
   Function(String id) deleteTransaction;
+  double percentage;
 
   // Function(String id) deleteTransaction;
 
-  TransactionList(
-      this.availableHeight, this.deleteTransaction, this.transactions,
+  TransactionList(this.percentage, this.availableHeight, this.deleteTransaction,
+      this.transactions,
       {super.key}) {}
 
   Card buildTransactionTile(Transaction transaction, BuildContext context) {
@@ -96,7 +97,7 @@ class TransactionList extends StatelessWidget {
   Widget build(BuildContext context) {
     transactions.sort((b, a) => (a.date.compareTo(b.date)));
     var transactionsSection = Container(
-      height: availableHeight * 0.6,
+      height: availableHeight * percentage,
       child: ListView.builder(
           itemCount: transactions.length,
           itemBuilder: (context, index) {

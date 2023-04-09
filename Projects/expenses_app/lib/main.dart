@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'models/transaction.dart';
 import 'widgets/chart.dart';
 import 'widgets/transaction_list.dart';
 import 'widgets/new_transaction.dart';
 import 'dart:math';
 
-void main() => runApp(const ExpensesApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight
+  ]);
+  runApp(const ExpensesApp());
+}
 
 class ExpensesApp extends StatelessWidget {
   const ExpensesApp({super.key});
@@ -152,6 +163,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  bool showChart = false;
+
   @override
   Widget build(BuildContext context) {
     var appBarWidget = buildAppBar(context);
@@ -175,19 +188,21 @@ class _HomePageState extends State<HomePage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            const Text("No transactions yet"),
-            const SizedBox(
-              height: 25,
-            ),
-            SizedBox(
-              height: 200,
-              child: Image.asset('assets/images/waiting.png'),
-            ),
-          ],
-        ),
+        LayoutBuilder(builder: (ctx, constraints) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              const Text("No transactions yet"),
+              const SizedBox(
+                height: 25,
+              ),
+              SizedBox(
+                height: constraints.maxHeight * 0.5,
+                child: Image.asset('assets/images/waiting.png'),
+              ),
+            ],
+          );
+        }),
       ],
     );
   }
@@ -208,7 +223,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class BodyWidget extends StatelessWidget {
+class BodyWidget extends StatefulWidget {
   List<Transaction> userTransactionList;
   Function(String id) deleteTransaction;
   double totalTopBarsHeight;
@@ -218,7 +233,18 @@ class BodyWidget extends StatelessWidget {
       {super.key});
 
   @override
+  State<BodyWidget> createState() => _BodyWidgetState();
+}
+
+class _BodyWidgetState extends State<BodyWidget> {
+  bool showChart = false;
+
+  @override
   Widget build(BuildContext context) {
+    bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    print("isLandscape------------------------");
+    print(isLandscape);
     var titleSection = Card(
       elevation: 5,
       child: Container(
@@ -229,19 +255,46 @@ class BodyWidget extends StatelessWidget {
     );
 
     var availableHeight =
-        (MediaQuery.of(context).size.height - totalTopBarsHeight);
+        (MediaQuery.of(context).size.height - widget.totalTopBarsHeight);
 
     var bodyWidget = SingleChildScrollView(
       child: Column(
         // mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          if (isLandscape)
+            Container(
+              height: availableHeight * 0.1,
+              child: Row(
+                children: [
+                  const Text(
+                    "Show",
+                  ),
+                  Switch(
+                      value: showChart,
+                      onChanged: (value) {
+                        setState(() {
+                          showChart = value;
+                        });
+                      }),
+                ],
+              ),
+            ),
           // titleSection,
-          Container(
-              height: availableHeight * 0.4,
-              child: ChartWidget(availableHeight, transactionsForChart)),
-          TransactionList(
-              availableHeight, deleteTransaction, transactionsForList),
+          if (!isLandscape)
+            Container(
+                height: availableHeight * 0.3,
+                child: ChartWidget(availableHeight, transactionsForChart)),
+          if (!isLandscape)
+            TransactionList(0.7, availableHeight, widget.deleteTransaction,
+                transactionsForList),
+          if (isLandscape && showChart)
+            Container(
+                height: availableHeight * 0.9,
+                child: ChartWidget(availableHeight, transactionsForChart)),
+          if (isLandscape && !showChart)
+            TransactionList(0.9, availableHeight, widget.deleteTransaction,
+                transactionsForList),
         ],
       ),
     );
@@ -254,14 +307,14 @@ class BodyWidget extends StatelessWidget {
   }
 
   List<Transaction> get transactionsForList {
-    return userTransactionList
+    return widget.userTransactionList
         // .where((element) => element.date
         //     .isAfter(DateTime.now().subtract(const Duration(days: 10))))
         .toList();
   }
 
   List<Transaction> get transactionsForChart {
-    return userTransactionList
+    return widget.userTransactionList
         // .where((element) => element.date
         //     .isAfter(DateTime.now().subtract(const Duration(days: 7))))
         .toList();
