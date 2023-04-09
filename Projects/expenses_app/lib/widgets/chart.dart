@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import 'dart:math' as math;
 
 class ChartWidget extends StatelessWidget {
-  const ChartWidget(this.thisWeekTransactions, {super.key});
+  ChartWidget(this.availableHeight, this.thisWeekTransactions, {super.key});
+  double availableHeight;
   final List<Transaction> thisWeekTransactions;
 
   List<Map> get groupedTransactionsValues {
@@ -71,6 +72,13 @@ class ChartWidget extends StatelessWidget {
       );
       var percentageExpense = double.parse(e['percentage']);
 
+      var computedHeight = availableHeight * 0.4;
+      normalizedExpense = normalizedExpense.isNaN ? 50 : normalizedExpense;
+      var heightFactor = normalizedExpense / 100;
+      var heightFactorLowerBox = percentageExpense / 100;
+      heightFactorLowerBox =
+          heightFactorLowerBox.isNaN ? 0.2 : heightFactorLowerBox;
+
       return Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -80,7 +88,7 @@ class ChartWidget extends StatelessWidget {
             width: 10,
             child: Stack(alignment: AlignmentDirectional.bottomEnd, children: [
               FractionallySizedBox(
-                heightFactor: normalizedExpense / 100,
+                heightFactor: heightFactor,
                 child: Container(
                   width: 50,
                   height: normalizedExpense,
@@ -90,7 +98,7 @@ class ChartWidget extends StatelessWidget {
                 ),
               ),
               FractionallySizedBox(
-                heightFactor: percentageExpense / 100,
+                heightFactor: heightFactorLowerBox,
                 child: Container(
                   decoration: const BoxDecoration(
                     color: Color.fromARGB(206, 201, 90, 26),

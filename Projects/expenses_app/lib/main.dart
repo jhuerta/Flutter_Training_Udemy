@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
 
     final randomAmount = new Random();
 
-    var transactionList = List.generate(1000, (index) {
+    var transactionList = List.generate(50, (index) {
       var daysToSubstract = (-1) * (randomAmount.nextInt(100));
       return Transaction(
         amount: 50 + randomAmount.nextDouble() * 100,
@@ -154,11 +154,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var appBarWidget = buildAppBar(context);
+    var heightAppBar = appBarWidget.preferredSize.height;
+    var topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      appBar: buildAppBar(context),
+      appBar: appBarWidget,
       body: userTransactionList.isEmpty
           ? noTransactionWidget()
-          : BodyWidget(deleteTransaction, userTransactionList),
+          : BodyWidget(deleteTransaction, userTransactionList,
+              heightAppBar + topPadding),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () => {_startAddNewTransaction(context)},
@@ -207,8 +211,11 @@ class _HomePageState extends State<HomePage> {
 class BodyWidget extends StatelessWidget {
   List<Transaction> userTransactionList;
   Function(String id) deleteTransaction;
+  double totalTopBarsHeight;
 
-  BodyWidget(this.deleteTransaction, this.userTransactionList, {super.key});
+  BodyWidget(
+      this.deleteTransaction, this.userTransactionList, this.totalTopBarsHeight,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -217,17 +224,24 @@ class BodyWidget extends StatelessWidget {
       child: Container(
         color: Theme.of(context).primaryColorDark,
         width: double.infinity,
-        child: const Text('List of past expenses'),
+        child: const Text('List of expenses.'),
       ),
     );
 
-    var bodyWidget = Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        titleSection,
-        ChartWidget(transactionsForChart),
-        TransactionList(deleteTransaction, transactionsForList),
-      ],
+    var availableHeight =
+        (MediaQuery.of(context).size.height - totalTopBarsHeight);
+
+    var bodyWidget = SingleChildScrollView(
+      child: Column(
+        // mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          titleSection,
+          ChartWidget(availableHeight, transactionsForChart),
+          TransactionList(
+              availableHeight, deleteTransaction, transactionsForList),
+        ],
+      ),
     );
 
     // var chartWidget = ChartWidget(userTransactionList);
@@ -239,15 +253,15 @@ class BodyWidget extends StatelessWidget {
 
   List<Transaction> get transactionsForList {
     return userTransactionList
-        .where((element) => element.date
-            .isAfter(DateTime.now().subtract(const Duration(days: 10))))
+        // .where((element) => element.date
+        //     .isAfter(DateTime.now().subtract(const Duration(days: 10))))
         .toList();
   }
 
   List<Transaction> get transactionsForChart {
     return userTransactionList
-        .where((element) => element.date
-            .isAfter(DateTime.now().subtract(const Duration(days: 7))))
+        // .where((element) => element.date
+        //     .isAfter(DateTime.now().subtract(const Duration(days: 7))))
         .toList();
   }
 }

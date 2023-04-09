@@ -4,11 +4,14 @@ import '../models/transaction.dart';
 
 class TransactionList extends StatelessWidget {
   List<Transaction> transactions;
+  double availableHeight;
   Function(String id) deleteTransaction;
 
   // Function(String id) deleteTransaction;
 
-  TransactionList(this.deleteTransaction, this.transactions, {super.key}) {}
+  TransactionList(
+      this.availableHeight, this.deleteTransaction, this.transactions,
+      {super.key}) {}
 
   Card buildTransactionTile(Transaction transaction, BuildContext context) {
     return Card(
@@ -93,7 +96,7 @@ class TransactionList extends StatelessWidget {
   Widget build(BuildContext context) {
     transactions.sort((b, a) => (a.date.compareTo(b.date)));
     var transactionsSection = Container(
-      height: 300,
+      height: availableHeight * 0.6,
       child: ListView.builder(
           itemCount: transactions.length,
           itemBuilder: (context, index) {
