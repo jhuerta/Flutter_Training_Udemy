@@ -236,8 +236,10 @@ class BodyWidget extends StatelessWidget {
         // mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          titleSection,
-          ChartWidget(availableHeight, transactionsForChart),
+          // titleSection,
+          Container(
+              height: availableHeight * 0.4,
+              child: ChartWidget(availableHeight, transactionsForChart)),
           TransactionList(
               availableHeight, deleteTransaction, transactionsForList),
         ],

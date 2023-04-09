@@ -47,16 +47,14 @@ class ChartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 6,
-      margin: const EdgeInsets.all(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: listOFBars,
-      ),
-    );
+        elevation: 6,
+        margin: const EdgeInsets.all(20),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: listOFBars()));
   }
 
-  List<Widget> get listOFBars {
+  List<Widget> listOFBars() {
     var amounts = groupedTransactionsValues
         .map((e) => double.parse(e['amount']))
         .toList();
@@ -72,59 +70,75 @@ class ChartWidget extends StatelessWidget {
       );
       var percentageExpense = double.parse(e['percentage']);
 
-      var computedHeight = availableHeight * 0.4;
       normalizedExpense = normalizedExpense.isNaN ? 50 : normalizedExpense;
       var heightFactor = normalizedExpense / 100;
       var heightFactorLowerBox = percentageExpense / 100;
       heightFactorLowerBox =
           heightFactorLowerBox.isNaN ? 0.2 : heightFactorLowerBox;
 
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(e['day']),
-          Container(
-            height: 100,
-            width: 10,
-            child: Stack(alignment: AlignmentDirectional.bottomEnd, children: [
-              FractionallySizedBox(
-                heightFactor: heightFactor,
-                child: Container(
-                  width: 50,
-                  height: normalizedExpense,
-                  decoration: const BoxDecoration(
-                    color: Colors.green,
+      return LayoutBuilder(builder: (ctx, constraints) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              height: constraints.maxHeight * 0.1,
+              child: FittedBox(child: Text(e['day'])),
+            ),
+            Container(
+              height: constraints.maxHeight * 0.8,
+              width: 10,
+              child: Stack(
+                // alignment: AlignmentDirectional.bottomEnd,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 1.0),
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                ),
+                  FractionallySizedBox(
+                    heightFactor: percentageExpense / 100,
+                    child: Container(
+                      width: 50,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey, width: 1.0),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                  // FractionallySizedBox(
+                  //   // heightFactor: heightFactorLowerBox,
+                  //   child: Container(
+                  //     decoration: const BoxDecoration(
+                  //       color: Color.fromARGB(206, 201, 90, 26),
+                  //     ),
+                  //   ),
+                  // )
+                  // Container(
+                  //   width: 50,
+                  //   height: percentageExpense,
+                  //   decoration: const BoxDecoration(
+                  //     color: Color.fromARGB(206, 201, 90, 26),
+                  //   ),
+                  // ),
+                ],
               ),
-              FractionallySizedBox(
-                heightFactor: heightFactorLowerBox,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color.fromARGB(206, 201, 90, 26),
-                  ),
-                ),
-              )
-              // Container(
-              //   width: 50,
-              //   height: percentageExpense,
-              //   decoration: const BoxDecoration(
-              //     color: Color.fromARGB(206, 201, 90, 26),
-              //   ),
-              // ),
-            ]),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 2, right: 2, top: 2, bottom: 2),
-            width: 40,
-            child: FittedBox(
-                child: Text(
-              style: TextStyle(color: Colors.green),
-              '\$${double.parse(e['amount']).toStringAsFixed(2)}',
-            )),
-          ),
-        ],
-      );
+            ),
+            Container(
+              height: constraints.maxHeight * 0.1,
+              margin: EdgeInsets.only(left: 2, right: 2),
+              width: 40,
+              child: FittedBox(
+                  child: Text(
+                style: TextStyle(color: Colors.green),
+                '\$${double.parse(e['amount']).toStringAsFixed(2)}',
+              )),
+            ),
+          ],
+        );
+      });
     }).toList();
 
     return bars;
