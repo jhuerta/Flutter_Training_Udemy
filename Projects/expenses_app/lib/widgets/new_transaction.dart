@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'adaptiveButton.dart';
 
 class NewTransaction extends StatefulWidget {
   Function(String title, double amount, DateTime date) addNewTransaction;
@@ -44,6 +46,22 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
+    var titleTextField = TextField(
+      keyboardType: TextInputType.text,
+      decoration: InputDecoration(labelText: "Title"),
+      controller: titleController,
+      onSubmitted: (_) => addNewExpense(),
+    );
+
+    var cupertinoTextField = CupertinoTextField(
+      placeholder: "Im a cupertino box",
+      controller: titleController,
+      keyboardType: TextInputType.number,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.red, width: 5),
+      ),
+    );
+
     var actionSection = SingleChildScrollView(
       child: Card(
         child: Container(
@@ -56,12 +74,7 @@ class _NewTransactionState extends State<NewTransaction> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              TextField(
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(labelText: "Title"),
-                controller: titleController,
-                onSubmitted: (_) => addNewExpense(),
-              ),
+              cupertinoTextField /*titleTextField*/,
               TextField(
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: "Amount"),
@@ -71,6 +84,7 @@ class _NewTransactionState extends State<NewTransaction> {
               Container(
                 height: 70,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Expanded(
                       child: Text(
@@ -80,28 +94,22 @@ class _NewTransactionState extends State<NewTransaction> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.all(10),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.all(10),
-                          backgroundColor: Colors.purple,
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: _presentDatePicker,
-                        child: const Text(
-                          "Pick Date",
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal, fontSize: 10),
-                        ),
+                      decoration: BoxDecoration(
+                        border: Border.all(),
                       ),
-                    )
+                      width: 150,
+                      margin: EdgeInsets.all(2),
+                      child: AdaptiveButton(_presentDatePicker,
+                          "Chose a Date") /*pickDateButton*/,
+                    ),
                   ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: addNewExpense,
-                child: const Text("Add"),
-              ),
+              AdaptiveButton(addNewExpense, "Add")
+              // ElevatedButton(
+              //   onPressed: addNewExpense,
+              //   child: const Text("Add"),
+              // ),
             ],
           ),
         ),
