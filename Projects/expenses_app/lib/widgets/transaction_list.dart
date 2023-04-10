@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/transaction.dart';
+import './transaction_card_item.dart';
 
-class TransactionList extends StatelessWidget {
+class TransactionList extends StatefulWidget {
   List<Transaction> transactions;
   double availableHeight;
   Function(String id) deleteTransaction;
@@ -14,56 +17,11 @@ class TransactionList extends StatelessWidget {
       this.transactions,
       {super.key}) {}
 
-  Card buildTransactionTile(Transaction transaction, BuildContext context) {
-    return Card(
-      elevation: 5,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
-      child: ListTile(
-        title: Text(transaction.title),
-        subtitle: Text(DateFormat.yMd().format(transaction.date)),
-        leading: CircleAvatar(
-          radius: 25,
-          child: Padding(
-            padding: EdgeInsets.all(5),
-            child:
-                FittedBox(child: Text(transaction.amount.toStringAsFixed(2))),
-          ),
-        ),
-        trailing: BuildIconButton(transaction, context),
-      ),
-    );
-  }
+  @override
+  State<TransactionList> createState() => _TransactionListState();
+}
 
-  Widget BuildIconButton(Transaction transaction, BuildContext context) {
-    bool bigScreen = MediaQuery.of(context).size.width > 400;
-    ;
-    var smallButton = IconButton(
-      onPressed: () {
-        deleteTransaction(transaction.id);
-      },
-      icon: Icon(Icons.delete),
-      color: Theme.of(context).colorScheme.error,
-    );
-
-    var bigButton = ElevatedButton.icon(
-      icon: Icon(Icons.delete),
-      style: const ButtonStyle(
-        iconColor:
-            MaterialStatePropertyAll<Color>(Color.fromARGB(255, 238, 5, 207)),
-        backgroundColor: MaterialStatePropertyAll<Color>(Colors.white),
-        foregroundColor:
-            MaterialStatePropertyAll<Color>(Color.fromARGB(255, 255, 17, 0)),
-        elevation: MaterialStatePropertyAll(0),
-      ),
-      label: Text("Delete Transaction"),
-      onPressed: () {
-        deleteTransaction(transaction.id);
-      },
-    );
-
-    return bigScreen ? bigButton : smallButton;
-  }
-
+class _TransactionListState extends State<TransactionList> {
   Card buildTransactionCard(Transaction transaction, BuildContext context) {
     return Card(
       shadowColor: Colors.blueGrey,
@@ -119,21 +77,21 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    transactions.sort((b, a) => (a.date.compareTo(b.date)));
-    var transactionsSection = Container(
-      height: availableHeight * percentage,
-      child: ListView.builder(
-          itemCount: transactions.length,
-          itemBuilder: (context, index) {
-            return buildTransactionTile(transactions[index], context);
-            // return buildTransactionCard(transactions[index], context);
-          }),
+    widget.transactions.sort((b, a) => (a.date.compareTo(b.date)));
 
-      // crossAxisAlignment: CrossAxisAlignment.stretch,
-      // children: transactions.map((tx) {
-      //   return buildTransactionCard(tx);
-      // }).toList(),
-    );
+    var transactionsSection = Container(
+        height: widget.availableHeight * widget.percentage,
+        child: ListView(
+            children: widget.transactions
+                .map(
+                  (theTransaction) => TransactionCardItem(
+                    widget.deleteTransaction,
+                    theTransaction,
+                    ValueKey(theTransaction.id),
+                  ),
+                )
+                .toList()));
+
     return transactionsSection;
   }
 }

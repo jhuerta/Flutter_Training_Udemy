@@ -291,9 +291,44 @@ class BodyWidget extends StatefulWidget {
   State<BodyWidget> createState() => _BodyWidgetState();
 }
 
-class _BodyWidgetState extends State<BodyWidget> {
+class _BodyWidgetState extends State<BodyWidget> with WidgetsBindingObserver {
   bool showChart = false;
 
+  @override
+  void didUpdateWidget(covariant BodyWidget oldWidget) {
+    print("widget.totalTopBarsHeight");
+    print(widget.totalTopBarsHeight);
+    print("oldWidget.totalTopBarsHeight");
+    print(oldWidget.totalTopBarsHeight);
+    print("didUpdateWidget <<<<<<<<<<<<<<<<<<<<<<<<");
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(
+        '+++++++++++++++++++++ ${state.index} - ${state.name} +++++++++++++++++++++');
+    super.didChangeAppLifecycleState(state);
+  }
+
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    print("Init state <<<<<<<<<<<<<<<<<<<<<<<<");
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    print("dispose <<<<<<<<<<<<<<<<<<<<<<<<");
+
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   @override
   Widget build(BuildContext context) {
     bool isLandscape =
