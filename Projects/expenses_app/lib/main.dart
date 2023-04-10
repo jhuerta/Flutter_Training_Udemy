@@ -235,10 +235,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Map<String, Object> buildAppBar(bool isIOS, BuildContext context) {
-    var androidAppBar = AppBar(
+  AppBar androidAppBar(BuildContext context) {
+    return AppBar(
       title: const Text(
-        'My Expenses App',
+        'Android - My Expenses App',
         //style: TextStyle(fontFamily: 'Quicksand'),
       ),
       actions: <Widget>[
@@ -248,8 +248,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     );
-    var iosAppBar = CupertinoNavigationBar(
-      middle: Text("My Expenses App"),
+  }
+
+  CupertinoNavigationBar iosAppBar(BuildContext context) {
+    return CupertinoNavigationBar(
+      middle: Text("iOS - My Expenses App"),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
@@ -262,11 +265,15 @@ class _HomePageState extends State<HomePage> {
       ),
       backgroundColor: Colors.orange,
     );
+  }
+
+  Map<String, Object> buildAppBar(bool isIOS, BuildContext context) {
+    var appBar = isIOS ? iosAppBar(context) : androidAppBar(context);
     return {
       'Dimentions': isIOS
-          ? (iosAppBar.preferredSize.height)
-          : androidAppBar.preferredSize.height,
-      'AppBar': isIOS ? iosAppBar : androidAppBar
+          ? (appBar as CupertinoNavigationBar).preferredSize.height
+          : (appBar as AppBar).preferredSize.height,
+      'AppBar': appBar
     };
   }
 }
